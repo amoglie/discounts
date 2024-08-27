@@ -1,46 +1,38 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+const puppeteer = require('puppeteer');
 
 module.exports = async (req, res) => {
   const url = 'https://www.passline.com/productora/nicetotickets';
 
   try {
-    console.log('Fetching data from:', url);
-    const { data } = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Referer': 'https://www.google.com/'
-      },
-      timeout: 10000
+    console.log('Launching browser');
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-    console.log('Data fetched successfully');
+    const page = await browser.newPage();
 
-    const $ = cheerio.load(data);
-    const events = [];
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
-    $('li').each((index, element) => {
-      const $element = $(element);
-      const title = $element.find('.titulo-tarjeta-buscador').text().trim();
-      const date = $element.find('.icon-calendar').parent().text().trim();
-      const price = $element.find('.price').text().trim();
-      const location = $element.find('.icon-location').parent().text().trim();
-      const imageUrl = $element.find('img').attr('src');
-      const ticketLink = $element.find('.btnbuy').attr('href');
+    console.log('Navigating to:', url);
+    await page.goto(url, { waitUntil: 'networkidle0' });
 
-      if (title) {
-        events.push({
-          title,
-          date,
-          price,
-          location,
-          imageUrl,
-          ticketLink
-        });
-      }
+    console.log('Scraping data');
+    const events = await page.evaluate(() => {
+      const eventElements = document.querySelectorAll('li');
+      return Array.from(eventElements).map(element => {
+        const title = element.querySelector('.titulo-tarjeta-buscador')?.textContent.trim();
+        const date = element.querySelector('.icon-calendar')?.parentElement.textContent.trim();
+        const price = element.querySelector('.price')?.textContent.trim();
+        const location = element.querySelector('.icon-location')?.parentElement.textContent.trim();
+        const imageUrl = element.querySelector('img')?.src;
+        const ticketLink = element.querySelector('.btnbuy')?.href;
+
+        return title ? { title, date, price, location, imageUrl, ticketLink } : null;
+      }).filter(Boolean);
     });
 
+    await browser.close();
+
+    console.log('Scraping completed');
     res.status(200).json(events);
   } catch (error) {
     console.error('Error occurred:', error.message);
