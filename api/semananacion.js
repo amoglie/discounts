@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
 
   try {
     console.log('Fetching data from:', url);
-    const { data } = await axios.get(url, {
+    const response = await axios.get(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -17,8 +17,11 @@ module.exports = async (req, res) => {
       }
     });
     console.log('Data fetched successfully');
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+    console.log('Response data preview:', response.data.substring(0, 500)); // Mostrar los primeros 500 caracteres
 
-    const $ = cheerio.load(data);
+    const $ = cheerio.load(response.data);
     const items = [];
 
     $('.ItemV1_item__lN3MZ').each((index, element) => {
@@ -34,13 +37,18 @@ module.exports = async (req, res) => {
       });
     });
 
-    // Establecer headers para evitar caché en la respuesta
+    console.log('Scraped items:', items);
+
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
 
-    res.status(200).json(items);
+    res.status(200).json({
+      message: 'Scraping completed',
+      itemsCount: items.length,
+      items: items
+    });
   } catch (error) {
     console.error('Error occurred:', error.message);
     res.status(500).json({ error: 'Error scraping the website', details: error.message });
