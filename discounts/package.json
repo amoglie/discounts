@@ -1,17 +1,16 @@
 {
   "name": "discounts",
   "version": "1.0.0",
-  "description": "Proyecto Node.js desde cero",
+  "description": "Un scraper para obtener información de eventos desde passline.com",
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js",
-    "test": "jest",
-    "lint": "eslint .",
-    "build": "npm run lint && npm test"
+    "scrape": "node src/scraper.js"
   },
   "author": "",
-  "license": "ISC",
-  "dependencies": {},
-  "devDependencies": {}
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.10"
+  }
 }
