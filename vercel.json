@@ -1,7 +1,12 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/scraper.js", "use": "@vercel/node" },
-    { "src": "*.html", "use": "@vercel/static" }
-  ]
-}
+     "version": 2,
+     "builds": [
+       { "src": "api/scraper.js", "use": "@vercel/node" },
+       { "src": "*.html", "use": "@vercel/static" }
+     ],
+     "routes": [
+       { "src": "/api/scraper", "dest": "api/scraper.js" },
+       { "handle": "filesystem" },
+       { "src": "/(.*)", "dest": "/index.html" }
+     ]
+   }
