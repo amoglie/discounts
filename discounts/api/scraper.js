@@ -1,27 +1,29 @@
-// src/scraper.js
-
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-// URL que deseas scrapear
-const url = 'https://www.passline.com/productora/nicetotickets';
+module.exports = async (req, res) => {
+  const url = 'https://www.passline.com/productora/nicetotickets';
 
-async function scrapeWebsite() {
   try {
-    // Hacer una solicitud HTTP GET a la URL
+    console.log('Fetching data from:', url);
     const { data } = await axios.get(url);
+    console.log('Data fetched successfully');
 
-    // Cargar el HTML en cheerio
     const $ = cheerio.load(data);
+    console.log('HTML loaded into Cheerio');
 
-    // Aquí puedes comenzar a capturar la información que necesitas
     const events = [];
 
-    // Selecciona los elementos que contienen la información de los eventos
     $('.event-card').each((index, element) => {
       const eventTitle = $(element).find('.event-card-title').text().trim();
       const eventDate = $(element).find('.event-card-date').text().trim();
       const eventLink = $(element).find('a').attr('href');
+
+      console.log(`Event ${index + 1}:`, {
+        title: eventTitle,
+        date: eventDate,
+        link: eventLink ? `https://www.passline.com${eventLink}` : null,
+      });
 
       events.push({
         title: eventTitle,
@@ -30,13 +32,9 @@ async function scrapeWebsite() {
       });
     });
 
-    // Mostrar la información capturada en la consola
-    console.log(events);
-
+    res.status(200).json(events);
   } catch (error) {
-    console.error(`Error scraping the website: ${error}`);
+    console.error('Error occurred:', error.message);
+    res.status(500).json({ error: 'Error scraping the website', details: error.message });
   }
-}
-
-// Ejecutar la función de scraping
-scrapeWebsite();
+};
