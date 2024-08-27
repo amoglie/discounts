@@ -4,12 +4,20 @@
     {
       "src": "api/scraper.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "src/index.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/scraper",
       "dest": "api/scraper.js"
+    },
+    {
+      "src": "/",
+      "dest": "src/index.js"
     }
   ]
 }
