@@ -1,19 +1,7 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "api/scraper.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/scraper",
-      "dest": "api/scraper.js"
-    },
-    {
-      "src": "/",
-      "dest": "index.html"
-    }
+    { "src": "api/scraper.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" }
   ]
 }
