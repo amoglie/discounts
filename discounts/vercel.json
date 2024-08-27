@@ -2,18 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/scraper.js",
+      "src": "discounts/api/scraper.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/scraper",
-      "dest": "api/scraper.js"
+      "dest": "discounts/api/scraper.js"
     },
     {
       "src": "/",
-      "dest": "/index.html"
+      "dest": "/discounts/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/discounts/$1"
     }
   ]
 }
