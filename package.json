@@ -1,0 +1,16 @@
+{
+  "name": "discounts",
+  "version": "1.0.0",
+  "description": "Un scraper para obtener información de eventos desde passline.com",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "scrape": "node src/scraper.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.10"
+  }
+}
